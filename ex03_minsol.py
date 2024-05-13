@@ -1,3 +1,4 @@
+import os
 import random
 import string
 from difflib import SequenceMatcher
@@ -6,7 +7,7 @@ import matplotlib.pyplot as plt
 
 goal = "charles darwin was always seasick"
 length_of_goal = len(goal)
-simulations = 10  # Number of simulations to run
+simulations = 10 # Number of simulations to run
 generations_needed = []
 
 def get_random_string(length):
@@ -16,6 +17,7 @@ def get_random_string(length):
 
 for simulation in range(simulations):
     generation = 0
+    print(f"========== Simulation {simulation} started ==========")
     default_str = get_random_string(length_of_goal)
     similarity = int(SequenceMatcher(None, default_str, goal).ratio() * 100)
     while similarity < 100:
@@ -25,7 +27,7 @@ for simulation in range(simulations):
         temp_str = default_str[:random_index] + new_letter + default_str[random_index + 1:]
         new_sim = int(SequenceMatcher(None, temp_str, goal).ratio() * 100)
 
-        if new_sim > similarity:
+        if new_sim >= similarity:
             default_str = temp_str
             similarity = new_sim
             generation += 1
@@ -34,8 +36,9 @@ for simulation in range(simulations):
             
     generations_needed.append(generation)
 
-    
-    
+average_generations = sum(generations_needed) / len(generations_needed)
+print(f"Average generations needed: {average_generations:.2f}")
+
 # Plotting results
 plt.figure(figsize=(10, 5))
 plt.hist(generations_needed, bins=30, color='blue', alpha=0.7)
@@ -43,7 +46,19 @@ plt.title('Distribution of Generations Needed')
 plt.xlabel('Generations Needed')
 plt.ylabel('Frequency')
 plt.grid(True)
+
+text_x = 0.95  
+text_y1 = 0.85  
+text_y2 = 0.80
+plt.text(text_x, text_y1, f'Total simulations: {simulations}', fontsize=12, ha='right', va='top', transform=plt.gca().transAxes)
+plt.text(text_x, text_y2, f'Average generations needed: {average_generations:.2f}', fontsize=12, ha='right', va='top', transform=plt.gca().transAxes, color='black')
+
+
+
+# Save the plot
+plot_path = os.path.join('plots', 'fitness_distribution.png')
+plt.savefig(plot_path)
+print(f"Plot saved to {plot_path}")
+
 plt.show()
 
-average_generations = sum(generations_needed) / len(generations_needed)
-print(f"Average generations needed: {average_generations:.2f}")
